@@ -1,4 +1,3 @@
-# pylint: disable=superfluous-parens,no-member
 import argparse
 import random
 import sys
@@ -9,7 +8,6 @@ import os
 from saddlepoint import saddlepoint
 from deap import creator, base, tools, algorithms
 
-# Compare output to http://compbio-research.cs.brown.edu/projects/multi-dendrix/results/Multi/BRCA/
 def get_args():
     """
     Sets up argparse and collects arguements.
