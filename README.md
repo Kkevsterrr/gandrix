@@ -66,7 +66,28 @@ Collected 507 patients in mutation matrix.
 Searching for good gene sets of size 3 with initial population of 5000 in 100 generations.
 Generation: 0 | Unique Inviduals: 2795 | Best Fitness (47,) (56/507: 11.05%) | Best ADK-MYST4(A) ENSG00000247772 3p25.1(A)
 Generation: 1 | Unique Inviduals: 2442 | Best Fitness (52,) (55/507: 10.85%) | Best CPAMD8 GTSE1 RB1(D)
-^C
+...
+Best individuals:
+Fitness (245,) (266/507: 52.47%): TP53 CDH1 GATA3
+Fitness (219,) (231/507: 45.56%): PIK3CA GRIK2 PTEN(D)
+Fitness (125,) (140/507: 27.61%): ANKRD11(D) GNPTAB PTPRD(D)
+Fitness (121,) (127/507: 25.05%): MAP3K1 ERBB2(A) MED23
+Fitness (108,) (123/507: 24.26%): MAP2K4(D) PAK1(A) RPGR
+Fitness (106,) (124/507: 24.46%): MLL3 20p12.1(D) MIR21(A)
+Fitness (104,) (122/507: 24.06%): CCND1(A) MAP2K4 8q21.13(A)
+Fitness (104,) (110/507: 21.70%): DDR2 8p11.23(A) 11p13(A)
+Fitness (95,) (122/507: 24.06%): ENSG00000245549 8p11(A) 11p13(A)
+Fitness (81,) (99/507: 19.53%): RB1(D) MYC(A) NCOR1
+```
+
+With a non-unique hall of fame:
+```
+$ python gandrix.py --non-unique-hall
+Loaded BRCA dataset.
+Collected 202 genes.
+Collected 507 patients in mutation matrix.
+Searching for good gene sets of size 3 with initial population of 5000 in 100 generations.
+...
 Best individuals:
 Fitness (229,) (247/507: 48.72%): GATA3 TP53 CTCF
 Fitness (220,) (229/507: 45.17%): CADPS MAP3K1 TP53
@@ -82,7 +103,7 @@ Fitness (199,) (199/507: 39.25%): NINL DALRD3 TP53
 
 The GBM dataset is also bundled with gandrix, as well as a small toy dataset for demonstration purposes. 
 ```
-$ python gandrix.py --data test    
+$ python gandrix.py --data test --non-unique-hall
 Loaded TEST dataset.
 Collected 9 genes.
 Collected 10 patients in mutation matrix.
@@ -106,13 +127,6 @@ Best individuals:
 Fitness (10,) (10/10: 100.00%): gene9 gene7 gene8
 Fitness (10,) (10/10: 100.00%): gene4 gene5 gene6
 Fitness (10,) (10/10: 100.00%): gene3 gene2 gene1
-Fitness (9,) (9/10: 90.00%): gene5 gene7 gene4
-Fitness (9,) (9/10: 90.00%): gene9 gene1 gene8
-Fitness (8,) (8/10: 80.00%): gene8 gene4 gene7
-Fitness (8,) (8/10: 80.00%): gene4 gene5 gene1
-Fitness (8,) (8/10: 80.00%): gene2 gene1 gene9
-Fitness (7,) (10/10: 100.00%): gene9 gene6 gene8
-Fitness (7,) (10/10: 100.00%): gene2 gene3 gene7
 ```
 
 ### Adding new datasets
