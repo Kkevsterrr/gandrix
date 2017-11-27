@@ -32,6 +32,7 @@ optional arguments:
   --exclude EXCLUDE     exclude certain genes
   --data {gbm,test,brca}
                         dataset to run on
+  --non-unique-hall     Allow genes to be repeated in hall of fame.
 ```
 
 To stop gandrix, Ctrl-C will stop execution and print the current hall of fame individuals. 
@@ -49,7 +50,9 @@ In each generation, every individual is evaluated using a fitness function. This
 Mutation and crossover are independently applied to every individual with 40% probability (so it is possible that an individual undergo both mutation and crossover). The order of these operations is left to DEAP's default. If an individual is chosen to be mutated, each gene in that individual is replaced with a different randomly sampled gene with 25% probability. If an individual is chosen for crossover, it is mated with another individual uniformly by swapping genes (each gene is swapped with 50% probability).  
 
 ### Hall of Fame
-After each generation, every individual is evaluated against the best 10 individuals ever seen before. 
+After each generation, the entire population is evaluated against the best 10 individuals ever seen before, and the best 10 individuals from this combined population are saved into the Hall of Fame. By default, the hall of fame enforces gene uniqueness - a gene may appear in the hall of fame only once. This can be disabled with the option --non-unique-hall, a faster hall of fame implementation, to allow for genes to repeat in the hall of fame. 
+
+A potential downside of disabling the gene-uniqueness, however, is that certain genes may be prone to dominating the hall of fame. For example, gene TP53 in the BRCA dataset has such high coverage that it is common to find many more than 10 other gene sets with higher fitness than the next best (and actually correct) solution using different known cancer pathways (such as PIK3CA). 
 
 ## Examples
 
