@@ -40,7 +40,16 @@ To stop gandrix, Ctrl-C will stop execution and print the current hall of fame i
 
 Gandrix uses a genetic algorithm built on DEAP to evolve a "good" set of genes. The goal is to discover a set of genes that has high coverage (it "covers"/is mutated in a large number of cancer patients) with high exclusivity (there is low overlap between patients). 
 
-Each individual in the population is a collection of genes of size $k$, and begins completely randomly initialized ($k$ random genes are uniformly sampled with replacement to create an individual *i*). When the algorith starts, an initial population  *P* (specified by the arguments) is spawned by creating |*P*| individuals. 
+Each individual in the population is a collection of genes of size *k*, and begins completely randomly initialized ($k$ random genes are uniformly sampled with replacement to create an individual *i*). When the algorith starts, an initial population  *P* (specified by the arguments) is spawned by creating |*P*| individuals. At each generation, every individual is mutated and undergoes crossover. These offspring are evaulated using a specified fitness function, and the best individuals survive. As generations continue, the individuals gradually converge to the best solution. At the conclusion of the algorithm, the "hall of fame" is printed to the user of the best individuals encountered through the life cycle of the algorithm. 
+
+### Fitness functions
+In each generation, every individual is evaluated using a fitness function. This fitness function is the codification of  which gene sets are "good" or "bad". Two fitness functions are implemented in Gandrix ("dendrix" or "wext"). The "dendrix" fitness function is a simple function: (set coverage) - (*C* * set overlap), where *C* is a constant (currently heuristically set as 3). The "wext" fitness function uses the approximation statistical test defined in the wext package, and is much slower to compute. This fitness function also rewards sets where each gene individually has exclusive high coverage (as opposed to one single high coverage gene and multiple small exclusive but low coverage genes). 
+
+### Mutation & Crossover
+Mutation and crossover are independently applied to every individual with 40% probability (so it is possible that an individual undergo both mutation and crossover). The order of these operations is left to DEAP's default. If an individual is chosen to be mutated, each gene in that individual is replaced with a different randomly sampled gene with 25% probability. If an individual is chosen for crossover, it is mated with another individual uniformly by swapping genes (each gene is swapped with 50% probability).  
+
+### Hall of Fame
+After each generation, every individual is evaluated against the best 10 individuals ever seen before. 
 
 ## Examples
 
