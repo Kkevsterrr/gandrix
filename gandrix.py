@@ -13,15 +13,16 @@ def get_args():
     Sets up argparse and collects arguements.
     """
 
-    parser = argparse.ArgumentParser(description='Genetic algorithm for BRCA pathways.')
+    parser = argparse.ArgumentParser(description='Genetic algorithm for de novo discovery of exclusively mutated pathways.')
     parser.add_argument('--k', type=int, action='store', default=3, help='solution size to search for')
     parser.add_argument('--eval-only', action='store', default=None, help='only evaluate fitness for given comma-separated genes')
     parser.add_argument('--generations', type=int, action='store', default=100, help="number of generations to run for.")
-    parser.add_argument('--population', type=int, action='store', default=10000, help="size of population.")
+    parser.add_argument('--population', type=int, action='store', default=5000, help="size of population.")
     parser.add_argument('--fitness', choices=('wext', 'dendrix'), action='store', default='dendrix', help="fitness function to use.")
     parser.add_argument('--no-size-compute', action='store_true', default=False, help="flag whether to disable population size computation.")
     parser.add_argument('--exclude', action='store', default=None, help="exclude certain genes")
     parser.add_argument('--data', action='store', choices=('gbm', 'test', 'brca'), default="brca", help="dataset to run on")
+    parser.add_argument('--non-unique-hall', action='store_true', default=False, help="Allow genes to be repeated in hall of fame.")
     args = parser.parse_args()
     return args
 
@@ -227,7 +228,7 @@ def get_unique_population_size(population, no_size_compute):
     return len(uniques)
 
 
-def add_to_hof(hof, population):
+def add_to_hof(hof, population, non_unique_hall):
     fits = {}
     for best in hof:
         fits[str(sorted(list(best)))] = (best, best.fitness.values)
@@ -235,8 +236,18 @@ def add_to_hof(hof, population):
         fits[str(sorted(list(ind)))] = (ind, ind.fitness.values)
     sorted_fits = sorted(fits.iteritems(), reverse=True, key=lambda (k,v): (v[1],k)) 
     hof = []
-    for best in sorted_fits[:10]:
-        hof.append(best[1][0])
+    used_genes = set()
+    if non_unique_hall:
+        for best in sorted_fits[:10]:
+            hof.append(best[1][0])
+    else:
+        for best in sorted_fits:
+            if (any(x for x in used_genes if x in best[1][0])):
+                continue
+            hof.append(best[1][0])
+            if len(hof) == 10:
+                break
+            used_genes.update([x for x in best[1][0]])
     return hof
 
 
@@ -259,7 +270,7 @@ def genetic_solve(options, genes, matrix, fitness_function):
     toolbox.register("mutate", tools.mutUniformInt, low=0, up=len(genes)-1, indpb=0.25)
     toolbox.register("select", tools.selTournament, tournsize=2)
     
-    hall = [] 
+    hall = []
     population = toolbox.population(n=options["population_size"])
     
     try:
@@ -274,8 +285,7 @@ def genetic_solve(options, genes, matrix, fitness_function):
             best_one = toolbox.select(offspring, k=1)[0]
             best_fit = fitness_function(matrix, best_one)
             best_coverage = get_coverage_exclusivity(matrix, best_one)[0]
-            #hall.update(population)
-            hall = add_to_hof(hall, population)
+            hall = add_to_hof(hall, population, options["non-unique-hall"])
             print("Generation: %d | Unique Inviduals: %d | Best Fitness %s (%d/%d: %0.2f%%) | Best %s %s\r" % (gen, get_unique_population_size(population, options["no_size_compute"]), str(best_fit), best_coverage, len(matrix), round(100.0*float(best_coverage)/float(len(matrix)), 2), get_names(genes, best_one).strip(), " "*20))
     except KeyboardInterrupt:
         print("\nBest individuals:")
@@ -333,7 +343,7 @@ def driver():
 
     args = get_args() 
     genes_list_file, patients_file = validate_dataset(args.data) 
-
+    print("Loaded %s dataset." % args.data.upper())
     without = args.exclude
     if without:
         print("Excluding %s from analysis" % without)
@@ -357,7 +367,7 @@ def driver():
         pretty_print(patient_matrix)
 
     if eval_only:
-        print("Computing fitness for M = %s" % eval_only)
+        print("Computing fitness for: %s" % eval_only)
         ind = []
         for gene in [x.strip() for x in eval_only.split(",")]:
             ind.append(full_gene_list.index(gene))
@@ -366,10 +376,12 @@ def driver():
 
     
     options = {}
+    options["non-unique-hall"] = args.non_unique_hall
     options["population_size"] = args.population
     options["solution_size"] = args.k
     options["num_generations"] = args.generations
     options["no_size_compute"] = args.no_size_compute
+    print("Searching for good gene sets of size %d with initial population of %d in %d generations." % (args.k, args.population, args.generations))
     hall_of_fame = genetic_solve(options, full_gene_list, patient_matrix, fitness_function) 
     print_results(full_gene_list, patient_matrix, hall_of_fame, fitness_function)
 
