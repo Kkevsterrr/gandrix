@@ -103,7 +103,7 @@ Fitness (199,) (199/507: 39.25%): NINL DALRD3 TP53
 
 The GBM dataset is also bundled with gandrix, as well as a small toy dataset for demonstration purposes. 
 ```
-$ python gandrix.py --data test --non-unique-hall
+$ python gandrix.py --data test
 Loaded TEST dataset.
 Collected 9 genes.
 Collected 10 patients in mutation matrix.
@@ -129,4 +129,23 @@ Fitness (10,) (10/10: 100.00%): gene4 gene5 gene6
 Fitness (10,) (10/10: 100.00%): gene3 gene2 gene1
 ```
 
+As an example of how --non-unique-hall helps to uncover other suboptimal but good solutions:
+```
+$ python gandrix.py --data test --non-unique-hall
+...
+Best individuals:
+Fitness (10,) (10/10: 100.00%): gene7 gene9 gene8
+Fitness (10,) (10/10: 100.00%): gene6 gene5 gene4
+Fitness (10,) (10/10: 100.00%): gene3 gene2 gene1
+Fitness (9,) (9/10: 90.00%): gene5 gene4 gene7
+Fitness (9,) (9/10: 90.00%): gene9 gene1 gene8
+Fitness (8,) (8/10: 80.00%): gene8 gene7 gene4
+Fitness (8,) (8/10: 80.00%): gene1 gene4 gene5
+Fitness (8,) (8/10: 80.00%): gene1 gene9 gene2
+Fitness (7,) (10/10: 100.00%): gene9 gene6 gene8
+Fitness (7,) (10/10: 100.00%): gene2 gene7 gene3
+```
+
 ### Adding new datasets
+
+To add new datasets to gandrix, make a new subfolder under the data/directory. Inside this folder, make 2 files: gene_list.txt and patients.txt. gene_list.txt is a list of all genes in the sample, and patients.txt is a mutation matrix where each line is a patient, and each gene listed on that line is mutated in that patient. These genes should be tab separated. See examples in the data/test/ folder as an example. 
